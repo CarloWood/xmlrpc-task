@@ -30,7 +30,7 @@
 #include "statefultask/AIStatefulTask.h"
 #include "socket-task/ConnectToEndPoint.h"
 #include "evio/protocol/http.h"
-#include "evio/protocol/XML_RPC_Decoder.h"
+#include "evio/protocol/xmlrpc/Decoder.h"
 #include "evio/protocol/xmlrpc/ElementDecoder.h"
 #include "evio/protocol/xmlrpc/Request.h"
 #include "debug.h"
@@ -51,18 +51,15 @@ class XML_RPC_MethodCall : public AIStatefulTask
   /// The different states of the stateful task.
   enum xml_rpc_method_call_state_type {
     XML_RPC_MethodCall_start = direct_base_type::state_end,
-    XML_RPC_MethodCall_connect_begin,
     XML_RPC_MethodCall_connected,
-    XML_RPC_MethodCall_connect_failed,
     XML_RPC_MethodCall_done
   };
 
   boost::intrusive_ptr<task::ConnectToEndPoint> m_connect_to_end_point;
-  std::shared_ptr<xmlrpc::Request const> m_request;
-  std::shared_ptr<xmlrpc::ElementDecoder> m_response;
+  std::shared_ptr<evio::protocol::xmlrpc::Request const> m_request;
+  std::shared_ptr<evio::protocol::xmlrpc::ElementDecoder> m_response;
   evio::protocol::http::ResponseHeadersDecoder m_input_decoder;
-  evio::protocol::xmlrpc::ResponseDecoder m_xml_rpc_decoder;
-  XML_RPC_Decoder m_xml_rpc_decoder;
+  evio::protocol::xmlrpc::Decoder m_xml_rpc_decoder;
   evio::OutputStream m_output_stream;
 
  public:
@@ -84,13 +81,13 @@ class XML_RPC_MethodCall : public AIStatefulTask
 
   AIEndPoint const& get_end_point() const { return m_connect_to_end_point->get_end_point(); }
 
-  void set_request_object(std::shared_ptr<xmlrpc::Request const> request) { m_request = std::move(request); }
+  void set_request_object(std::shared_ptr<evio::protocol::xmlrpc::Request const> request) { m_request = std::move(request); }
 
-  std::shared_ptr<xmlrpc::Request const> const& get_request_object() const { return m_request; }
+  std::shared_ptr<evio::protocol::xmlrpc::Request const> const& get_request_object() const { return m_request; }
 
-  void set_response_object(std::shared_ptr<xmlrpc::ElementDecoder> response) { m_response = std::move(response); m_xml_rpc_decoder.init(m_response.get()); }
+  void set_response_object(std::shared_ptr<evio::protocol::xmlrpc::ElementDecoder> response) { m_response = std::move(response); m_xml_rpc_decoder.init(m_response.get()); }
 
-  std::shared_ptr<xmlrpc::ElementDecoder> const& get_response_object() const { return m_response; }
+  std::shared_ptr<evio::protocol::xmlrpc::ElementDecoder> const& get_response_object() const { return m_response; }
 
  protected:
   /// Call finish() (or abort()), not delete.

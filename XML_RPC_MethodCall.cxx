@@ -27,8 +27,8 @@
 
 #include "sys.h"
 #include "XML_RPC_MethodCall.h"
-#include "evio/protocol/XML_RPC_Decoder.h"
-#include "evio/protocol/XML_RPC_Encoder.h"
+#include "evio/protocol/xmlrpc/Decoder.h"
+#include "evio/protocol/xmlrpc/Encoder.h"
 #include "evio/protocol/http.h"
 #include "utils/debug_ostream_operators.h"
 
@@ -39,6 +39,7 @@ char const* XML_RPC_MethodCall::state_str_impl(state_type run_state) const
   switch(run_state)
   {
     AI_CASE_RETURN(XML_RPC_MethodCall_start);
+    AI_CASE_RETURN(XML_RPC_MethodCall_connected);
     AI_CASE_RETURN(XML_RPC_MethodCall_done);
   }
   ASSERT(false);
@@ -67,7 +68,7 @@ void XML_RPC_MethodCall::multiplex_impl(state_type run_state)
                 "Content-Type: text/xml\r\n";
 
             std::stringstream ss;
-            XML_RPC_Encoder encoder(ss);
+            evio::protocol::xmlrpc::Encoder encoder(ss);
 
             try
             {
