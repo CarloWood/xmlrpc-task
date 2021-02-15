@@ -44,6 +44,8 @@ target_compile_features(xmlrpc-task_ObjLib
 target_link_libraries(xmlrpc-task_ObjLib
   PUBLIC
     AICxx::socket-task
+  PRIVATE
+    farmhash::farmhash
 )
 
 # Create an ALIAS target.
