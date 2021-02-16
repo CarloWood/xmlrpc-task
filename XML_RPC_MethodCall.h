@@ -51,7 +51,7 @@ class XML_RPC_MethodCall : public AIStatefulTask
   /// The different states of the stateful task.
   enum xml_rpc_method_call_state_type {
     XML_RPC_MethodCall_start = direct_base_type::state_end,
-    XML_RPC_MethodCall_connected,
+    XML_RPC_MethodCall_check_status_code,
     XML_RPC_MethodCall_done
   };
 
@@ -68,7 +68,7 @@ class XML_RPC_MethodCall : public AIStatefulTask
 
   /// Construct an XML_RPC_MethodCall object.
   XML_RPC_MethodCall(CWDEBUG_ONLY(bool debug = false)) : CWDEBUG_ONLY(AIStatefulTask(debug), )
-                                                         m_connect_to_end_point(new task::ConnectToEndPoint),
+                                                         m_connect_to_end_point(new task::ConnectToEndPoint{CWDEBUG_ONLY(debug)}),
                                                          m_input_decoder({{"text/xml", m_xml_rpc_decoder}})
     { DoutEntering(dc::statefultask(mSMDebug), "XML_RPC_MethodCall() [" << (void*)this << "]"); }
 

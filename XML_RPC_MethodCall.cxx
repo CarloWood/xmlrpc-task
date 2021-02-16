@@ -39,7 +39,7 @@ char const* XML_RPC_MethodCall::state_str_impl(state_type run_state) const
   switch(run_state)
   {
     AI_CASE_RETURN(XML_RPC_MethodCall_start);
-    AI_CASE_RETURN(XML_RPC_MethodCall_connected);
+    AI_CASE_RETURN(XML_RPC_MethodCall_check_status_code);
     AI_CASE_RETURN(XML_RPC_MethodCall_done);
   }
   ASSERT(false);
@@ -54,6 +54,7 @@ void XML_RPC_MethodCall::multiplex_impl(state_type run_state)
     {
       // Initialize.
       auto socket = evio::create<evio::Socket>();
+      socket->set_source(m_output_stream);
       socket->set_protocol_decoder(m_input_decoder);
       m_connect_to_end_point->set_socket(std::move(socket));
       m_connect_to_end_point->on_connected([this](bool success){
@@ -88,13 +89,20 @@ void XML_RPC_MethodCall::multiplex_impl(state_type run_state)
           }
         });
       m_connect_to_end_point->run(this, 1);
-      // Wait until m_connect_to_end_point has connected successfully, then continue at state connected.
-      set_state(XML_RPC_MethodCall_connected);
+      // Wait until m_connect_to_end_point has finished successfully, then continue at state check_status_code.
+      set_state(XML_RPC_MethodCall_check_status_code);
       wait(1);
       break;
     }
-    case XML_RPC_MethodCall_connected:
-      break;
+    case XML_RPC_MethodCall_check_status_code:
+      if (m_input_decoder.get_status_code() != 200)
+      {
+        Dout(dc::warning, "Received HTTP status code is " << m_input_decoder.get_status_code());
+        abort();
+        break;
+      }
+      set_state(XML_RPC_MethodCall_done);
+      [[fallthrough]];
     case XML_RPC_MethodCall_done:
       finish();
       break;
