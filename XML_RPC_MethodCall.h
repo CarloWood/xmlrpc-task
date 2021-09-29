@@ -64,7 +64,7 @@ class XML_RPC_MethodCall : public AIStatefulTask
 
  public:
   /// One beyond the largest state of this task.
-  static state_type constexpr state_end = XML_RPC_MethodCall_done + 1;
+  static constexpr state_type state_end = XML_RPC_MethodCall_done + 1;
 
   /// Construct an XML_RPC_MethodCall object.
   XML_RPC_MethodCall(CWDEBUG_ONLY(bool debug = false)) : CWDEBUG_ONLY(AIStatefulTask(debug), )
