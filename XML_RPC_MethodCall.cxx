@@ -42,8 +42,7 @@ char const* XML_RPC_MethodCall::state_str_impl(state_type run_state) const
     AI_CASE_RETURN(XML_RPC_MethodCall_check_status_code);
     AI_CASE_RETURN(XML_RPC_MethodCall_done);
   }
-  ASSERT(false);
-  return "UNKNOWN STATE";
+  AI_NEVER_REACHED;
 }
 
 void XML_RPC_MethodCall::multiplex_impl(state_type run_state)
